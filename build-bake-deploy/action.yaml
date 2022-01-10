@@ -7,4 +7,5 @@ runs:
       - name: test env var
         run: |
           echo "${FOO}"
+          echo secret ${{ secrets.AQUA_PASSWORD }}
         shell: bash
