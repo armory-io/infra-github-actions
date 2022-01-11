@@ -27,9 +27,6 @@ runs:
             account: armory-hosted-services-prod-agent
             namespace: armory-hosted-services-staging
             strategy: staging-strategy
-            afterDeployment:
-              - pause:
-                  untilApproved: true
           prod:
             account: armory-hosted-services-prod-agent
             namespace: armory-hosted-services-prod
@@ -49,6 +46,8 @@ runs:
               steps:
                 - setWeight:
                     weight: 100
+                - pause:
+                    untilApproved: true        
           prod-strategy:
             canary:
               steps:
