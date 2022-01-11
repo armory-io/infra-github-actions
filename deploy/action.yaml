@@ -1,0 +1,68 @@
+name: deploy
+description: deploys baked manifest with Armory Deployments
+
+inputs:
+  application_name:
+    description: The application that is getting deployed
+    required: true
+  armory_cloud_client_id:
+    description: The client id from armory cloud client credentials
+    required: true
+  armory_cloud_client_secret:
+    description: The client secret from armory cloud client credentials
+    required: true
+
+runs:
+  using: composite
+  steps:
+    - name: Generate Deployment Manfiest
+      run: >-
+        mkdir -p build/armory
+        cat << EOF > build/armory/deployment.yaml
+        version: v1
+        kind: kubernetes
+
+        targets:
+          staging:
+            account: armory-hosted-services-prod-agent
+            namespace: armory-hosted-services-staging
+            strategy: staging-strategy
+          prod:
+            account: armory-hosted-services-prod-agent
+            namespace: armory-hosted-services-prod
+            strategy: prod-strategy
+            constraints:
+              dependsOn: ["staging"]
+              beforeDeployment:
+                - pause:
+                    untilApproved: true
+
+        manifests:
+          - path: build/manifests/staging-manifests.yaml
+            targets: ["staging"]
+          - path: build/manifests/prod-manifests.yaml
+            targets: ["prod"]
+
+        strategies:
+          staging-strategy:
+            canary:
+              steps:
+                - setWeight:
+                    weight: 100
+          prod-strategy:
+            canary:
+              steps:
+                - setWeight:
+                    weight: 50
+                - pause:
+                    untilApproved: true
+        EOF
+      shell: bash
+
+    - name: Start Armory Deployment
+      uses: armory/cli-deploy-action@feature/extra_args
+      with:
+        applicationName: ${{ inputs.application_name }}
+        clientId: ${{ inputs.armory_cloud_client_id }}
+        clientSecret: ${{ inputs.armory_cloud_client_secret }}
+        path-to-file: build/armory/deployment.yaml
