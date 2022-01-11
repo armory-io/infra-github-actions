@@ -65,4 +65,4 @@ runs:
         applicationName: ${{ inputs.application_name }}
         clientId: ${{ inputs.armory_cloud_client_id }}
         clientSecret: ${{ inputs.armory_cloud_client_secret }}
-        path-to-file: build/armory/deployment.yaml
+        path-to-file: ./build/armory/deployment.yaml
