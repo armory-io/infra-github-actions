@@ -2,7 +2,7 @@ name: create release action
 description: Creates the tag and GitHub release, using conventional commits.
 
 inputs:
-  github-token:
+  github_token:
     description: Github token
     required: true
 
@@ -19,7 +19,7 @@ runs:
       id: push_tag
       uses: mathieudutour/github-tag-action@v6.0
       with:
-        github_token: ${{ inputs.github-token }}
+        github_token: ${{ inputs.github_token }}
         default_bump: patch
         release_branches: master
 
@@ -46,7 +46,7 @@ runs:
       id: create_release
       uses: actions/create-release@v1
       env:
-        GITHUB_TOKEN: ${{ inputs.github-token }}
+        GITHUB_TOKEN: ${{ inputs.github_token }}
       with:
         tag_name: ${{ steps.push_tag.outputs.new_tag }}
         release_name: ${{ github.event.repository.name }} ${{ steps.push_tag.outputs.new_version }}
