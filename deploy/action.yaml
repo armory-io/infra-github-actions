@@ -38,9 +38,9 @@ runs:
                     untilApproved: true
 
         manifests:
-          - path: build/manifests/staging-manifests.yaml
+          - path: /build/manifests/staging-manifests.yaml
             targets: ["staging"]
-          - path: build/manifests/prod-manifests.yaml
+          - path: /build/manifests/prod-manifests.yaml
             targets: ["prod"]
 
         strategies:
