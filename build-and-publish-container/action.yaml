@@ -1,0 +1,36 @@
+name: Build and Publish Container Action
+description: Invokes gradle to build artifact and bake the docker container and push it to artifactory
+
+inputs:
+  artifactory_user:
+    description: The artifactory user
+    required: true
+  artifactory_token:
+    description: The artifactory token
+    required: true
+  registry:
+    description: The registry to login with
+    required: true
+
+runs:
+  using: composite
+  steps:
+    - uses: actions/checkout@v2
+      with:
+        ref: ${{ github.event.release.tag_name }}
+
+    - uses: actions/setup-java@v1
+      with:
+        java-version: 17
+
+    - name: Login to Artifactory
+      run: |
+        docker login -u ${{ inputs.artifactory_user }} -p ${{ inputs.artifactory_token }} ${{ inputs.registry }}
+      shell: bash
+
+    - name: Build Artifact
+      run: >-
+        ./gradlew build -x check dockerPush
+        -Partifactory_user=${{inputs.artifactory_user}}
+        -Partifactory_password=${{inputs.artifactory_token}}
+      shell: bash
