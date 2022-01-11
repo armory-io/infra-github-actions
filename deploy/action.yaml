@@ -16,7 +16,7 @@ runs:
   using: composite
   steps:
     - name: Generate Deployment Manfiest
-      run: >-
+      run: |
         mkdir -p build/armory
         cat << EOF > build/armory/deployment.yaml
         version: v1
