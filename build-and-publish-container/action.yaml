@@ -11,6 +11,10 @@ inputs:
   registry:
     description: The registry to login with
     required: true
+  gradle_build_docker_push_command:
+    description: The gradle tasks to run in addition to ./gradlew check build sonarqube
+    required: false
+    default: ./gradlew build -x check dockerPush
 
 runs:
   using: composite
@@ -30,7 +34,7 @@ runs:
 
     - name: Build Artifact
       run: >-
-        ./gradlew build -x check dockerPush
+        ${{ inputs.gradle_build_docker_push_command }}
         -Partifactory_user=${{inputs.artifactory_user}}
         -Partifactory_password=${{inputs.artifactory_token}}
       shell: bash
