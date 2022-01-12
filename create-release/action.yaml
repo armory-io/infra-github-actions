@@ -5,6 +5,22 @@ inputs:
   github_token:
     description: Github token
     required: true
+  sonar_token:
+    description: The Sonar Token to use
+    required: true
+  sonar_host_url:
+    description: The Sonar host to use
+    required: true
+  artifactory_user:
+    description: The artifactory user
+    required: true
+  artifactory_token:
+    description: The artifactory password
+    required: true
+  gradle_check_and_submit_command:
+    description: The gradle tasks to run in addition to ./gradlew check build sonarqube
+    required: false
+    default: ./gradlew check build integrationTest sonarqube
 
 runs:
   using: composite
@@ -26,6 +42,15 @@ runs:
     - name: Fetch Refresh
       run: git fetch --prune --tags
       shell: bash
+
+    - uses: armory-io/infra-github-actions/gradle-analyze-and-submit-to-sonar@master
+      with:
+        github_token: '${{ inputs.github_token }}'
+        sonar_token: '${{ inputs.sonar_token }}'
+        sonar_host_url: '${{ inputs.sonar_host_url }}'
+        artifactory_user: '${{ inputs.artifactory_user }}'
+        artifactory_token: '${{ inputs.artifactory_token }}'
+        gradle_check_and_submit_command: '${{ inputs.gradle_check_and_submit_command }}'
 
     - name: Generate Changelog
       id: changelog
