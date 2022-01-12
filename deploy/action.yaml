@@ -75,10 +75,7 @@ runs:
             namespace: armory-hosted-services-prod
             strategy: prod-strategy
             constraints:
-              dependsOn: ["staging"]
-              beforeDeployment:
-                - pause:
-                    untilApproved: true        
+              dependsOn: ["staging"]  
 
         manifests:
           - path: /build/manifests/staging-manifests.yaml
@@ -92,6 +89,8 @@ runs:
               steps:
                 - setWeight:
                     weight: 100
+                - pause:
+                    untilApproved: true
           prod-strategy:
             canary:
               steps:
