@@ -17,6 +17,10 @@ inputs:
   image_tag:
     description: The image tag to deploy
     required: true
+  values-path:
+    description: path to values files for helm chart
+    required: false
+    default: infrastructure/helm
 
 runs:
   using: composite
@@ -38,13 +42,13 @@ runs:
     - name: generate staging manfifests
       uses: ./generate-manifest-action
       with:
-        values-path: wormhole/infrastructure/helm
+        values-path: ${{ inputs.values-path }}
         environment: staging
         imageTag: ${{ inputs.image_tag }}
     - name: generate prod manfifests
       uses: ./generate-manifest-action
       with:
-        values-path: wormhole/infrastructure/helm
+        values-path: ${{ inputs.values-path }}
         environment: prod
         imageTag: ${{ inputs.image_tag }}
 
