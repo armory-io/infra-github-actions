@@ -29,6 +29,9 @@ runs:
       with:
         token: ${{ inputs.github_token }}
         submodules: recursive
+    - name: Fetch full history
+      run: git fetch --prune --tags --unshallow
+      shell: bash
     - uses: actions/setup-node@v2
       with:
         node-version: '16'
