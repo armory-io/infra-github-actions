@@ -2,6 +2,9 @@ name: deploy
 description: deploys baked manifest with Armory Deployments
 
 inputs:
+  github_token:
+    description: Github token
+    required: true
   application_name:
     description: The application that is getting deployed
     required: true
@@ -11,10 +14,46 @@ inputs:
   armory_cloud_client_secret:
     description: The client secret from armory cloud client credentials
     required: true
+  image_tag:
+    description: The image tag to deploy
+    required: true
 
 runs:
   using: composite
   steps:
+    - uses: actions/checkout@v2
+      with:
+        ref: ${{ inputs.image_tag }}
+
+    - uses: actions/checkout@v2
+      with:
+        repository: armory-io/infra-jvm-service-helm-chart
+        ref: master
+        token: ${{ inputs.github_token }}
+        path: generate-manifest-action
+
+    - run: mkdir -p ./build/{manifests,armory}
+      shell: bash
+
+    - name: generate staging manfifests
+      uses: ./generate-manifest-action
+      with:
+        values-path: wormhole/infrastructure/helm
+        environment: staging
+        imageTag: ${{ inputs.image_tag }}
+    - name: generate prod manfifests
+      uses: ./generate-manifest-action
+      with:
+        values-path: wormhole/infrastructure/helm
+        environment: prod
+        imageTag: ${{ inputs.image_tag }}
+
+    - name: Upload Manifests
+      uses: actions/upload-artifact@v2
+      with:
+        name: manifests
+        path: build/manifests
+
     - name: Generate Deployment Manfiest
       run: |
         mkdir -p build/armory
