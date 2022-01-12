@@ -1,0 +1,54 @@
+name: pull requests analysis
+description: Runs a projects checks/tests and submits results to SonarQube
+
+inputs:
+  github_token:
+    description: The Github Token to use
+    required: true
+  sonar_token:
+    description: The Sonar Token to use
+    required: true
+  sonar_host_url:
+    description: The Sonar host to use
+    required: true
+  artifactory_user:
+    description: The artifactory user
+    required: true
+  artifactory_token:
+    description: The artifactory password
+    required: true
+  gradle_check_and_submit_command:
+    description: The gradle tasks to run in addition to ./gradlew check build sonarqube
+    required: false
+    default: ./gradlew check build integrationTest sonarqube
+
+runs:
+  using: composite
+  steps:
+    - uses: actions/checkout@v2
+      with:
+        token: ${{ inputs.github_token }}
+        submodules: recursive
+    - uses: actions/setup-node@v2
+      with:
+        node-version: '16'
+    - uses: actions/setup-java@v1
+      with:
+        java-version: 17
+    - name: Run Checks and Submit to SonarQube
+      env:
+        GITHUB_TOKEN: ${{ inputs.github_token }}
+        SONAR_TOKEN: ${{ inputs.sonar_token }}
+        SONAR_HOST_URL: ${{ inputs.sonar_host_url }}
+      run: >-
+        ${{ inputs.gradle_check_and_submit_command }}
+        -Partifactory_user=${{ inputs.artifactory_user }}
+        -Partifactory_password=${{ inputs.artifactory_token }}
+      shell: bash
+    - name: Upload Tests Reports to Github
+      if: ${{ always() }}
+      uses: actions/upload-artifact@v2
+      with:
+        name: reports
+        path: |
+          integration/build/reports/*
