@@ -33,7 +33,6 @@ runs:
   steps:
     - name: Get temporary AWS Credentials
       env:
-        ROLE_NAME: armory-cloud-github-actions-role
         VAULT_ADDR: ${{ inputs.vault_token }}
         VAULT_TOKEN: ${{ inputs.vault_addr }}
         AWS_REGION: us-west-2
@@ -42,7 +41,7 @@ runs:
         wget --quiet https://releases.hashicorp.com/vault/1.5.5/vault_1.5.5_linux_amd64.zip
         unzip vault_1.5.5_linux_amd64.zip
         chmod +x ./vault
-        export CREDS=$(./vault write -format json aws/dev/sts/${ROLE_NAME} ttl=60m || exit 1)
+        export CREDS=$(./vault write -format json aws/hosted-services/sts/armory-cloud-github-actions-role ttl=60m || exit 1)
         AWS_ACCESS_KEY_ID=$(echo $CREDS | jq -r ".data.access_key")
         AWS_SECRET_ACCESS_KEY=$(echo $CREDS | jq -r ".data.secret_key")
         AWS_SESSION_TOKEN=$(echo $CREDS | jq -r ".data.security_token")
