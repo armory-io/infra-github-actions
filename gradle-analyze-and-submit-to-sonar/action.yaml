@@ -30,7 +30,9 @@ runs:
         token: ${{ inputs.github_token }}
         submodules: recursive
     - name: Fetch full history
-      run: git fetch --prune --tags --unshallow
+      run: |
+        git fetch --tags -f
+        git fetch --prune --tags --unshallow
       shell: bash
     - uses: actions/setup-node@v2
       with:
