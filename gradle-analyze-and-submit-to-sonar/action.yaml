@@ -33,8 +33,8 @@ runs:
   steps:
     - name: Get temporary AWS Credentials
       env:
-        VAULT_ADDR: ${{ inputs.vault_token }}
-        VAULT_TOKEN: ${{ inputs.vault_addr }}
+        VAULT_ADDR: ${{ inputs.vault_addr }}
+        VAULT_TOKEN: ${{ inputs.vault_token }}
         AWS_REGION: us-west-2
         AWS_DEFAULT_REGION: us-west-2
       run: |
