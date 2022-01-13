@@ -100,8 +100,6 @@ runs:
                     untilApproved: true
                 - setWeight:
                     weight: 100
-                - pause:
-                    untilApproved: true
         EOF
       shell: bash
 
