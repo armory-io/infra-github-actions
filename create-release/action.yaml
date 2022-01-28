@@ -69,7 +69,7 @@ runs:
         artifactory_token: '${{ inputs.artifactory_token }}'
         gradle_check_and_submit_command: '${{ inputs.gradle_check_and_submit_command }}'
 
-    - uses: armory-io/infra-github-actions/golang-analyze-and-submit-to-sonar@dp/golang
+    - uses: armory-io/infra-github-actions/golang-analyze-and-submit-to-sonar@master
       if: ${{ inputs.project_type == 'go' }}
       with:
         github_token: '${{ inputs.github_token }}'
