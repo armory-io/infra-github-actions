@@ -32,7 +32,7 @@ runs:
     - uses: actions/checkout@v2
       with:
         repository: armory-io/infra-jvm-service-helm-chart
-        ref: master
+        ref: feature/certs_valid_for_pods
         token: ${{ inputs.github_token }}
         path: generate-manifest-action
 
