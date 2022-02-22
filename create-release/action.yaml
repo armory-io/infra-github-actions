@@ -9,6 +9,10 @@ inputs:
     description: "The project's type (options: go, jvm)"
     required: false
     default: jvm
+  go_version:
+    description: "The go version to use"
+    required: false
+    default: "1.16"
   vault_token:
     description: The vault token
     required: true
@@ -76,6 +80,7 @@ runs:
         sonar_token: '${{ inputs.sonar_token }}'
         sonar_host_url: '${{ inputs.sonar_host_url }}'
         check_command: '${{ inputs.check_command }}'
+        go_version: '${{ inputs.go_version }}'
 
     - name: Generate Changelog
       id: changelog
