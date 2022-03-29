@@ -1,0 +1,72 @@
+name: deploy
+description: Deploys baked manifest with Armory Deployments
+
+inputs:
+  github_token:
+    description: Github token
+    required: true
+  application_name:
+    description: The application that is getting deployed
+    required: true
+  armory_cloud_client_id:
+    description: The client id from armory cloud client credentials
+    required: true
+  armory_cloud_client_secret:
+    description: The client secret from armory cloud client credentials
+    required: true
+  image_tag:
+    description: The image tag to deploy
+    required: true
+  armory_deployment_file:
+    description: Path to Armory Deployment definition file
+    required: false
+    default: infrastructure/armory/deployment.yaml
+  values_path:
+    description: path to values files for helm chart
+    required: false
+    default: infrastructure/helm
+
+runs:
+  using: composite
+  steps:
+    - uses: actions/checkout@v2
+      with:
+        ref: ${{ inputs.image_tag }}
+
+    - uses: actions/checkout@v2
+      with:
+        repository: armory-io/infra-jvm-service-helm-chart
+        ref: master
+        token: ${{ inputs.github_token }}
+        path: generate-manifest-action
+
+    - run: mkdir -p ./build/{manifests,armory}
+      shell: bash
+
+    - name: generate staging manfifests
+      uses: ./generate-manifest-action
+      with:
+        values-path: ${{ inputs.values_path }}
+        environment: staging
+        imageTag: ${{ inputs.image_tag }}
+
+    - name: generate prod manfifests
+      uses: ./generate-manifest-action
+      with:
+        values-path: ${{ inputs.values_path }}
+        environment: prod
+        imageTag: ${{ inputs.image_tag }}
+
+    - name: Upload Manifests
+      uses: actions/upload-artifact@v2
+      with:
+        name: manifests
+        path: build/manifests
+
+    - name: Start Armory Deployment
+      uses: armory/cli-deploy-action@master
+      with:
+        applicationName: ${{ inputs.application_name }}
+        clientId: ${{ inputs.armory_cloud_client_id }}
+        clientSecret: ${{ inputs.armory_cloud_client_secret }}
+        path-to-file: ${{ inputs.armory_deployment_file }}
