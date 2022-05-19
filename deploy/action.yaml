@@ -78,7 +78,7 @@ runs:
               dependsOn: ["staging"]
               beforeDeployment: 
                 - runWebhook:
-                    name: Run API Tests Against Production 
+                    name: Run API Tests Against Staging 
 
         manifests:
           - path: /build/manifests/staging-manifests.yaml
