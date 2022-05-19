@@ -101,7 +101,7 @@ runs:
                 "event_type": "armory-cloud-api-tests",
                 "client_payload": {
                     "environment": "prod",
-                    "fromArmory": "true"
+                    "fromArmory": "true",
                     "callbackUri": "{{armory.callbackUri}}/callback"
                     }
                 }
@@ -121,7 +121,7 @@ runs:
                 "event_type": "armory-cloud-api-tests",
                 "client_payload": {
                     "environment": "staging",
-                    "fromArmory": "true"
+                    "fromArmory": "true",
                     "callbackUri": "{{armory.callbackUri}}/callback"
                     }
                 }
