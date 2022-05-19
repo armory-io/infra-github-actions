@@ -88,7 +88,7 @@ runs:
         webhooks: 
           - name: Run API Tests Against Production
             method: POST
-            uriTemplate: https://api.github.com/repos/armory-io/infra-armory-cloud-api-tests/dispatches
+            uriTemplate: https://api.github.com/repos/armory-io/infra-armory-cloud-api-tests/actions/workflows/armory-cloud-api-tests.yaml/dispatches
             networkMode: direct
             headers:
               - key: Authorization
@@ -98,17 +98,17 @@ runs:
             bodyTemplate:
               inline:  >-
                 {
-                "event_type": "armory-cloud-api-tests",
-                "client_payload": {
+                "ref": "master",
+                "inputs": {
                     "environment": "prod",
-                    "fromArmory": "true"
+                    "fromArmory": "true",
                     "callbackUri": "{{armory.callbackUri}}/callback"
                     }
                 }
             retryCount: 3
           - name: Run API Tests Against Staging
             method: POST
-            uriTemplate: https://api.github.com/repos/armory-io/infra-armory-cloud-api-tests/dispatches
+            uriTemplate: https://api.github.com/repos/armory-io/infra-armory-cloud-api-tests/actions/workflows/armory-cloud-api-tests.yaml/dispatches
             networkMode: direct
             headers:
               - key: Authorization
@@ -118,10 +118,10 @@ runs:
             bodyTemplate:
               inline:  >-
                 {
-                "event_type": "armory-cloud-api-tests",
-                "client_payload": {
+                "ref": "master",
+                "inputs": {
                     "environment": "staging",
-                    "fromArmory": "true"
+                    "fromArmory": "true",
                     "callbackUri": "{{armory.callbackUri}}/callback"
                     }
                 }
