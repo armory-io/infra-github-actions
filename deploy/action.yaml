@@ -75,14 +75,57 @@ runs:
             namespace: armory-hosted-services-prod
             strategy: prod-strategy
             constraints:
-              dependsOn: ["staging"]  
+              dependsOn: ["staging"]
+              beforeDeployment: 
+                - runWebhook:
+                    name: Run API Tests Against Staging 
 
         manifests:
           - path: /build/manifests/staging-manifests.yaml
             targets: ["staging"]
           - path: /build/manifests/prod-manifests.yaml
             targets: ["prod"]
-
+        webhooks: 
+          - name: Run API Tests Against Production
+            method: POST
+            uriTemplate: https://api.github.com/repos/armory-io/infra-armory-cloud-api-tests/dispatches
+            networkMode: direct
+            headers:
+              - key: Authorization
+                value: token {{secrets.github_token}}
+              - key: Content-Type
+                value: application/json
+            bodyTemplate:
+              inline:  >-
+                {
+                "event_type": "armory-cloud-api-tests",
+                "client_payload": {
+                    "environment": "prod",
+                    "fromArmory": "true"
+                    "callbackUri": "{{armory.callbackUri}}/callback"
+                    }
+                }
+            retryCount: 3
+          - name: Run API Tests Against Staging
+            method: POST
+            uriTemplate: https://api.github.com/repos/armory-io/infra-armory-cloud-api-tests/dispatches
+            networkMode: direct
+            headers:
+              - key: Authorization
+                value: token {{secrets.github_token}}
+              - key: Content-Type
+                value: application/json
+            bodyTemplate:
+              inline:  >-
+                {
+                "event_type": "armory-cloud-api-tests",
+                "client_payload": {
+                    "environment": "staging",
+                    "fromArmory": "true"
+                    "callbackUri": "{{armory.callbackUri}}/callback"
+                    }
+                }
+            retryCount: 3
         strategies:
           staging-strategy:
             canary:
