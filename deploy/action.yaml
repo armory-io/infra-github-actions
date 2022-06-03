@@ -98,7 +98,7 @@ runs:
             bodyTemplate:
               inline:  >-
                 {
-                "ref": "master",
+                "ref": "main",
                 "inputs": {
                     "environment": "prod",
                     "fromArmory": "true",
