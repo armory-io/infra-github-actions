@@ -118,7 +118,7 @@ runs:
             bodyTemplate:
               inline:  >-
                 {
-                "ref": "master",
+                "ref": "main",
                 "inputs": {
                     "environment": "staging",
                     "fromArmory": "true",
