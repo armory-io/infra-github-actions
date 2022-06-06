@@ -76,9 +76,9 @@ runs:
             strategy: prod-strategy
             constraints:
               dependsOn: ["staging"]
-              beforeDeployment: 
-                - runWebhook:
-                    name: Run API Tests Against Staging 
+ #             beforeDeployment: 
+ #               - runWebhook:
+ #                   name: Run API Tests Against Staging 
 
         manifests:
           - path: /build/manifests/staging-manifests.yaml
