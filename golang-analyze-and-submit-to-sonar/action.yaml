@@ -19,6 +19,12 @@ inputs:
     description: The Go version to configure
     required: false
     default: '1.16'
+  vault_token:
+    description: The vault token
+    required: true
+  vault_addr:
+    description: The vault addr
+    required: true
 
 runs:
   using: composite
