@@ -55,7 +55,6 @@ runs:
       with:
         github_token: ${{ inputs.github_token }}
         default_bump: patch
-        release_branches: master
 
     - name: Fetch Refresh
       run: git fetch --prune --tags
