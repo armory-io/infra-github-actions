@@ -14,11 +14,11 @@ inputs:
   check_command:
     description: The command to generate a code coverage report
     required: false
-    default: make coverage
+    default: make check
   go_version:
     description: The Go version to configure
     required: false
-    default: '1.16'
+    default: '1.18'
   vault_token:
     description: The vault token
     required: true
@@ -62,3 +62,11 @@ runs:
       env:
         SONAR_TOKEN: ${{ inputs.sonar_token }}
         SONAR_HOST_URL: ${{ inputs.sonar_host_url }}
+
+    - name: Upload Tests Reports to Github
+      if: ${{ always() }}
+      uses: actions/upload-artifact@v2
+      with:
+        name: reports
+        path: |
+          build/reports/*
