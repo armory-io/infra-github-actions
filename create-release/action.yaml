@@ -32,9 +32,9 @@ inputs:
     description: The artifactory password
     required: true
   check_command:
-    description: The command to run to generate a code coverage report (Golang only).
+    description: The command to run to run checks and generate a code coverage report (Golang only).
     required: false
-    default: make coverage
+    default: make check
   gradle_check_and_submit_command:
     description: The gradle tasks to run in addition to ./gradlew check build sonarqube (JVM only).
     required: false
