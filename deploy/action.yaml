@@ -144,7 +144,7 @@ runs:
       shell: bash
 
     - name: Start Armory Deployment
-      uses: armory/cli-deploy-action@main
+      uses: armory/cli-deploy-action@dev
       with:
         applicationName: ${{ inputs.application_name }}
         clientId: ${{ inputs.armory_cloud_client_id }}
