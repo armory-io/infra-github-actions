@@ -1,0 +1,168 @@
+name: Deploy
+
+on:
+  workflow_call:
+    inputs:
+      application_name:
+        type: string
+        description: The application that is getting deployed
+        required: true
+      image_tag:
+        type: string
+        description: The image tag to deploy
+        required: true
+      values-path:
+        type: string
+        description: path to values files for helm chart
+        required: false
+        default: infrastructure/helm
+    secrets:
+      ARTIFACTORY_USER:
+        required: true
+      ARTIFACTORY_TOKEN:
+        required: true
+      ARMORY_PLATFORM_GITHUB_PAT_TOKEN:
+        required: true
+      ARMORY_CLOUD_PROD_CLIENT_ID:
+        required: true
+      ARMORY_CLOUD_PROD_CLIENT_SECRET:
+        required: true
+
+jobs:
+  deploy:
+    name: Deploy
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          ref: ${{ inputs.image_tag }}
+
+      - uses: actions/checkout@v2
+        with:
+          repository: armory-io/infra-jvm-service-helm-chart
+          ref: master
+          token: ${{ inputs.github_token }}
+          path: generate-manifest-action
+
+      - run: mkdir -p ./build/{manifests,armory}
+        shell: bash
+
+      - name: generate staging manifests
+        uses: ./generate-manifest-action
+        with:
+          values-path: ${{ inputs.values-path }}
+          environment: staging
+          imageTag: ${{ inputs.image_tag }}
+
+      - name: generate prod manifests
+        uses: ./generate-manifest-action
+        with:
+          values-path: ${{ inputs.values-path }}
+          environment: prod
+          imageTag: ${{ inputs.image_tag }}
+
+      - name: Upload Manifests
+        uses: actions/upload-artifact@v2
+        with:
+          name: manifests
+          path: build/manifests
+
+      - name: Generate Deployment Manifest
+        run: |
+          mkdir -p build/armory
+          cat << EOF > build/armory/deployment.yaml
+          version: v1
+          kind: kubernetes
+
+          targets:
+            staging:
+              account: armory-hosted-services-prod-agent
+              namespace: armory-hosted-services-staging
+              strategy: staging-strategy
+            prod:
+              account: armory-hosted-services-prod-agent
+              namespace: armory-hosted-services-prod
+              strategy: prod-strategy
+              constraints:
+                dependsOn: ["staging"]
+
+          manifests:
+            - path: /build/manifests/staging-manifests.yaml
+              targets: ["staging"]
+            - path: /build/manifests/prod-manifests.yaml
+              targets: ["prod"]
+          webhooks:
+            - name: Run API Tests Against Production
+              method: POST
+              uriTemplate: https://api.github.com/repos/armory-io/infra-armory-cloud-api-tests/actions/workflows/armory-cloud-api-tests.yaml/dispatches
+              networkMode: direct
+              headers:
+                - key: Authorization
+                  value: token {{secrets.github_token}}
+                - key: Content-Type
+                  value: application/json
+              bodyTemplate:
+                inline:  >-
+                  {
+                  "ref": "main",
+                  "inputs": {
+                      "environment": "prod",
+                      "fromArmory": "true",
+                      "callbackUri": "{{armory.callbackUri}}/callback"
+                      }
+                  }
+              retryCount: 3
+            - name: Run API Tests Against Staging
+              method: POST
+              uriTemplate: https://api.github.com/repos/armory-io/infra-armory-cloud-api-tests/actions/workflows/armory-cloud-api-tests.yaml/dispatches
+              networkMode: direct
+              headers:
+                - key: Authorization
+                  value: token {{secrets.github_token}}
+                - key: Content-Type
+                  value: application/json
+              bodyTemplate:
+                inline:  >-
+                  {
+                  "ref": "main",
+                  "inputs": {
+                      "environment": "staging",
+                      "fromArmory": "true",
+                      "callbackUri": "{{armory.callbackUri}}/callback"
+                      }
+                  }
+              retryCount: 3
+          strategies:
+            staging-strategy:
+              canary:
+                steps:
+                  - setWeight:
+                      weight: 100
+                  - pause:
+                      untilApproved: true
+            prod-strategy:
+              canary:
+                steps:
+                  - setWeight:
+                      weight: 33
+                  - pause:
+                      untilApproved: true
+                  - setWeight:
+                      weight: 100
+          EOF
+        shell: bash
+
+      - name: Login to Artifactory
+        uses: docker/login-action@v1
+        with:
+          registry: armory-docker-local.jfrog.io
+          username: ${{ secrets.ARTIFACTORY_USER }}
+          password: ${{ secrets.ARTIFACTORY_TOKEN }}
+
+      - name: Start Armory Deployment
+        uses: armory/cli-deploy-action@dev
+        with:
+          applicationName: ${{ inputs.application_name }}
+          clientId: ${{ inputs.armory_cloud_client_id }}
+          clientSecret: ${{ inputs.armory_cloud_client_secret }}
+          path-to-file: /build/armory/deployment.yaml
