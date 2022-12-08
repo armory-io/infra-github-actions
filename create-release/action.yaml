@@ -15,22 +15,22 @@ inputs:
     default: "1.16"
   vault_token:
     description: The vault token
-    required: true
+    required: false
   vault_addr:
     description: The vault addr
-    required: true
+    required: false
   sonar_token:
     description: The Sonar Token to use
-    required: true
+    required: false
   sonar_host_url:
     description: The Sonar host to use
-    required: true
+    required: false
   artifactory_user:
     description: The artifactory user
-    required: true
+    required: false
   artifactory_token:
     description: The artifactory password
-    required: true
+    required: false
   check_command:
     description: The command to run to run checks and generate a code coverage report (Golang only).
     required: false
@@ -73,7 +73,7 @@ runs:
         gradle_check_and_submit_command: '${{ inputs.gradle_check_and_submit_command }}'
 
     - uses: armory-io/infra-github-actions/golang-analyze-and-submit-to-sonar@master
-      if: ${{ inputs.project_type == 'go' }}
+      if: ${{ inputs.project_type == 'go' && inputs.check_command != '' }}
       with:
         github_token: '${{ inputs.github_token }}'
         vault_addr: '${{ inputs.vault_addr }}'
