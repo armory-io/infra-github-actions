@@ -24,7 +24,7 @@ runs:
         AWS_DEFAULT_REGION: us-west-2
       run: |
         wget --quiet https://releases.hashicorp.com/vault/1.5.5/vault_1.5.5_linux_amd64.zip
-        unzip vault_1.5.5_linux_amd64.zip
+        unzip -o vault_1.5.5_linux_amd64.zip
         chmod +x ./vault
         export CREDS=$(./vault write -format json aws/${{ inputs.aws_account }}/sts/armory-cloud-github-actions-role ttl=60m || exit 1)
         AWS_ACCESS_KEY_ID=$(echo $CREDS | jq -r ".data.access_key")
