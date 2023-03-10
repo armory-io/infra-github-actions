@@ -40,12 +40,12 @@ runs:
         unzip -o vault_1.5.5_linux_amd64.zip
         chmod +x ./vault
         CERT_DATA=$(./vault write -format json ${{ inputs.pki_engine_path }} common_name="${{ inputs.common_name }}" ttl="${{ inputs.ttl }}")
-        PRIVATE_KEY=$(echo $CERT_DATA | jq -r '.data.private_key')
-        CRT=$(echo $CERT_DATA | jq -r '.data.certificate')
+        PRIVATE_KEY=$(echo $CERT_DATA | jq -jr '.data.private_key')
+        CRT=$(echo $CERT_DATA | jq -jr '.data.certificate')
         echo -n ${PRIVATE_KEY}
         echo -n ${CRT}
         echo -n $PRIVATE_KEY > ${{ inputs.key_filename }}
-        echo -n $CRT >  ${{ inputs.certificate_filename }}
+        echo -n $CRT > ${{ inputs.certificate_filename }}
         ls -al ${{ inputs.key_filename }}
         ls -al ${{ inputs.certificate_filename }}
       shell: bash
