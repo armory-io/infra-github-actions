@@ -58,10 +58,10 @@ runs:
         ${{ inputs.check_command }}
       shell: bash
 
-    - uses: sonarsource/sonarqube-scan-action@master
-      env:
-        SONAR_TOKEN: ${{ inputs.sonar_token }}
-        SONAR_HOST_URL: ${{ inputs.sonar_host_url }}
+    - uses: dominikh/staticcheck-action@v1.3.0
+      with:
+        version: "2022.1.1"
+        install-go: false
 
     - name: Upload Tests Reports to Github
       if: ${{ always() }}
