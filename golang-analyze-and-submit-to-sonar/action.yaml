@@ -5,12 +5,6 @@ inputs:
   github_token:
     description: The Github Token to use
     required: true
-  sonar_token:
-    description: The Sonar Token to use
-    required: true
-  sonar_host_url:
-    description: The Sonar host to use
-    required: true
   check_command:
     description: The command to generate a code coverage report
     required: false
