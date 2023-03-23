@@ -42,10 +42,10 @@ runs:
         CERT_DATA=$(./vault write -format json ${{ inputs.pki_engine_path }} common_name="${{ inputs.common_name }}" ttl="${{ inputs.ttl }}")
         TEMPORAL_CLIENT_KEY=$(echo -n $CERT_DATA | jq -jr '.data.private_key')
         TEMPORAL_CLIENT_CERT=$(echo -n $CERT_DATA | jq -jr '.data.certificate')
-        echo -n ${TEMPORAL_CLIENT_KEY}
-        echo -n ${CRT}
-        echo -n ${TEMPORAL_CLIENT_KEY} > ${{ inputs.key_filename }}
-        echo -n ${TEMPORAL_CLIENT_CERT} > ${{ inputs.certificate_filename }}
+        echo -n "${TEMPORAL_CLIENT_KEY}" > ${{ inputs.key_filename }}
+        echo -n "${TEMPORAL_CLIENT_CERT}" > ${{ inputs.certificate_filename }}
         ls -al ${{ inputs.key_filename }}
         ls -al ${{ inputs.certificate_filename }}
+        cat ${{ inputs.key_filename }}
+        cat ${{ inputs.certificate_filename }}
       shell: bash
