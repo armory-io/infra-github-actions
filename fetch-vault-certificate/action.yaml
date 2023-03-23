@@ -42,8 +42,10 @@ runs:
         CERT_DATA=$(./vault write -format json ${{ inputs.pki_engine_path }} common_name="${{ inputs.common_name }}" ttl="${{ inputs.ttl }}")
         TEMPORAL_CLIENT_KEY=$(echo -n $CERT_DATA | jq -jr '.data.private_key')
         TEMPORAL_CLIENT_CERT=$(echo -n $CERT_DATA | jq -jr '.data.certificate')
-        echo "TEMPORAL_CLIENT_KEY='$TEMPORAL_CLIENT_KEY'"
-        echo "TEMPORAL_CLIENT_CERT='$TEMPORAL_CLIENT_CERT'"
-        echo "TEMPORAL_CLIENT_KEY='$TEMPORAL_CLIENT_KEY'" >> $GITHUB_ENV
-        echo "TEMPORAL_CLIENT_CERT='$TEMPORAL_CLIENT_CERT'" >> $GITHUB_ENV
+        echo -n ${TEMPORAL_CLIENT_KEY}
+        echo -n ${CRT}
+        echo -n ${TEMPORAL_CLIENT_KEY} > ${{ inputs.key_filename }}
+        echo -n ${TEMPORAL_CLIENT_CERT} > ${{ inputs.certificate_filename }}
+        ls -al ${{ inputs.key_filename }}
+        ls -al ${{ inputs.certificate_filename }}
       shell: bash
