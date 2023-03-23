@@ -44,8 +44,4 @@ runs:
         TEMPORAL_CLIENT_CERT=$(echo -n $CERT_DATA | jq -jr '.data.certificate')
         echo -n "${TEMPORAL_CLIENT_KEY}" > ${{ inputs.key_filename }}
         echo -n "${TEMPORAL_CLIENT_CERT}" > ${{ inputs.certificate_filename }}
-        ls -al ${{ inputs.key_filename }}
-        ls -al ${{ inputs.certificate_filename }}
-        cat ${{ inputs.key_filename }}
-        cat ${{ inputs.certificate_filename }}
       shell: bash
