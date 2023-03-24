@@ -1,0 +1,47 @@
+name: generate a certificate with vault
+description: Generates a certificate with vault
+
+inputs:
+  vault_token:
+    description: The vault token
+    required: true
+  vault_addr:
+    description: The vault addr
+    required: true
+  pki_engine_path:
+    description: The path in vault to the PKI engine
+    required: true
+  common_name:
+    description: The CA common name
+    required: false
+    default: cloud.armory.io
+  key_filename:
+    description: The file name (including path) to write the certificate private key (.key) to
+    required: true
+  certificate_filename:
+    description: The file name (including path) to write the certificate (.crt) to
+    required: true
+  ttl:
+    description: The ttl for the generated certificate
+    required: false
+    default: 1h
+
+runs:
+  using: composite
+  steps:
+    - name: Generate cert from vault
+      env:
+        VAULT_ADDR: ${{ inputs.vault_addr }}
+        VAULT_TOKEN: ${{ inputs.vault_token }}
+        AWS_REGION: us-west-2
+        AWS_DEFAULT_REGION: us-west-2
+      run: |
+        wget --quiet https://releases.hashicorp.com/vault/1.5.5/vault_1.5.5_linux_amd64.zip
+        unzip -o vault_1.5.5_linux_amd64.zip
+        chmod +x ./vault
+        CERT_DATA=$(./vault write -format json ${{ inputs.pki_engine_path }} common_name="${{ inputs.common_name }}" ttl="${{ inputs.ttl }}")
+        TEMPORAL_CLIENT_KEY=$(echo -n $CERT_DATA | jq -jr '.data.private_key')
+        TEMPORAL_CLIENT_CERT=$(echo -n $CERT_DATA | jq -jr '.data.certificate')
+        echo -n "${TEMPORAL_CLIENT_KEY}" > ${{ inputs.key_filename }}
+        echo -n "${TEMPORAL_CLIENT_CERT}" > ${{ inputs.certificate_filename }}
+      shell: bash
