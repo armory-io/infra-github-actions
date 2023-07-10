@@ -1,9 +1,15 @@
 name: pull requests analysis
-description: Runs a projects checks/tests
+description: Runs a projects checks/tests and submits results to SonarQube
 
 inputs:
   github_token:
     description: The Github Token to use
+    required: true
+  sonar_token:
+    description: The Sonar Token to use
+    required: true
+  sonar_host_url:
+    description: The Sonar host to use
     required: true
   check_command:
     description: The command to generate a code coverage report
@@ -61,6 +67,11 @@ runs:
       run: >-
         ${{ inputs.check_command }}
       shell: bash
+
+    - uses: sonarsource/sonarqube-scan-action@master
+      env:
+        SONAR_TOKEN: ${{ inputs.sonar_token }}
+        SONAR_HOST_URL: ${{ inputs.sonar_host_url }}
 
     - uses: dominikh/staticcheck-action@v1.3.0
       with:
