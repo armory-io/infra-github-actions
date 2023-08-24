@@ -10,9 +10,8 @@ inputs:
     required: false
     default: jvm
   go_version:
-    description: "The go version to use"
+    description: The Go version to configure. If not provided, will use the one specified in `go.mod` file.
     required: false
-    default: "1.16"
   vault_token:
     description: The vault token
     required: false

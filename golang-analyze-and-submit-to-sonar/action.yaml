@@ -16,9 +16,8 @@ inputs:
     required: false
     default: make check
   go_version:
-    description: The Go version to configure
+    description: The Go version to configure. If not provided, will use the one specified in `go.mod` file.
     required: false
-    default: '1.18'
   vault_token:
     description: The vault token
     required: true
@@ -48,9 +47,10 @@ runs:
       shell: bash
 
     - name: Setup Go environment
-      uses: actions/setup-go@v2.1.4
+      uses: actions/setup-go@v3.5.0
       with:
         go-version: ${{ inputs.go_version }}
+        go-version-file: go.mod
         
     - uses: actions/cache@v3
       with:
