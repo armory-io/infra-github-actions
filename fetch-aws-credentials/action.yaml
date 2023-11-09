@@ -11,7 +11,7 @@ inputs:
   vault_aws_secret_backend:
     description: The name of the Vault AWS Secret backend to fetch credentials from.
   aws_account:
-    description: Deprecated. This input is misnamed. Is still used if vault_aws_secret_backend is empty.
+    description: '[Deprecated] This input is misnamed. Is still used if vault_aws_secret_backend is empty.'
     default: armory-cloud-non-prod
   role:
     description: Vault role you want to assume
