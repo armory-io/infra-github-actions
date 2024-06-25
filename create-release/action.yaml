@@ -18,12 +18,12 @@ inputs:
   vault_addr:
     description: The vault addr
     required: false
-  sonar_token:
-    description: The Sonar Token to use
-    required: false
-  sonar_host_url:
-    description: The Sonar host to use
-    required: false
+  # sonar_token:
+  #   description: The Sonar Token to use
+  #   required: false
+  # sonar_host_url:
+  #   description: The Sonar host to use
+  #   required: false
   artifactory_user:
     description: The artifactory user
     required: false
@@ -34,9 +34,9 @@ inputs:
     description: The command to run to run checks and generate a code coverage report (Golang only).
     required: false
   gradle_check_and_submit_command:
-    description: The gradle tasks to run in addition to ./gradlew check build sonarqube (JVM only).
+    description: The gradle tasks to run in addition to ./gradlew check build (JVM only).
     required: false
-    default: ./gradlew check build integrationTest sonarqube
+    default: ./gradlew check build integrationTest
 
 runs:
   using: composite
@@ -58,28 +58,28 @@ runs:
       run: git fetch --prune --tags
       shell: bash
 
-    - uses: armory-io/infra-github-actions/gradle-analyze-and-submit-to-sonar@master
-      if: ${{ inputs.project_type == 'jvm' }}
-      with:
-        github_token: '${{ inputs.github_token }}'
-        vault_addr: '${{ inputs.vault_addr }}'
-        vault_token: '${{ inputs.vault_token }}'
-        sonar_token: '${{ inputs.sonar_token }}'
-        sonar_host_url: '${{ inputs.sonar_host_url }}'
-        artifactory_user: '${{ inputs.artifactory_user }}'
-        artifactory_token: '${{ inputs.artifactory_token }}'
-        gradle_check_and_submit_command: '${{ inputs.gradle_check_and_submit_command }}'
+    # - uses: armory-io/infra-github-actions/gradle-analyze-and-submit-to-sonar@master
+    #   if: ${{ inputs.project_type == 'jvm' }}
+    #   with:
+    #     github_token: '${{ inputs.github_token }}'
+    #     vault_addr: '${{ inputs.vault_addr }}'
+    #     vault_token: '${{ inputs.vault_token }}'
+    #     sonar_token: '${{ inputs.sonar_token }}'
+    #     sonar_host_url: '${{ inputs.sonar_host_url }}'
+    #     artifactory_user: '${{ inputs.artifactory_user }}'
+    #     artifactory_token: '${{ inputs.artifactory_token }}'
+    #     gradle_check_and_submit_command: '${{ inputs.gradle_check_and_submit_command }}'
 
-    - uses: armory-io/infra-github-actions/golang-analyze-and-submit-to-sonar@master
-      if: ${{ inputs.project_type == 'go' && inputs.check_command != '' }}
-      with:
-        github_token: '${{ inputs.github_token }}'
-        vault_addr: '${{ inputs.vault_addr }}'
-        vault_token: '${{ inputs.vault_token }}'
-        sonar_token: '${{ inputs.sonar_token }}'
-        sonar_host_url: '${{ inputs.sonar_host_url }}'
-        check_command: '${{ inputs.check_command }}'
-        go_version: '${{ inputs.go_version }}'
+    # - uses: armory-io/infra-github-actions/golang-analyze-and-submit-to-sonar@master
+    #   if: ${{ inputs.project_type == 'go' && inputs.check_command != '' }}
+    #   with:
+    #     github_token: '${{ inputs.github_token }}'
+    #     vault_addr: '${{ inputs.vault_addr }}'
+    #     vault_token: '${{ inputs.vault_token }}'
+    #     sonar_token: '${{ inputs.sonar_token }}'
+    #     sonar_host_url: '${{ inputs.sonar_host_url }}'
+    #     check_command: '${{ inputs.check_command }}'
+    #     go_version: '${{ inputs.go_version }}'
 
     - name: Generate Changelog
       id: changelog
