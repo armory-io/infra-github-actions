@@ -98,12 +98,10 @@ runs:
 
     - name: Create Release
       id: create_release
-      uses: actions/create-release@v1
-      env:
-        GITHUB_TOKEN: ${{ inputs.github_token }}
+      uses: softprops/action-gh-release@v2
       with:
         tag_name: ${{ steps.push_tag.outputs.new_tag }}
-        release_name: ${{ steps.push_tag.outputs.new_version }}
+        name: ${{ steps.push_tag.outputs.new_version }}
         body: |
           ${{ steps.changelog.outputs.CHANGELOG }}
         draft: false
